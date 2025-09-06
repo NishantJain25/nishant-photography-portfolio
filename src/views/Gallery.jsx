@@ -2,7 +2,7 @@ import React from "react";
 import { styled } from "styled-components";
 import Sidebar from "../components/Sidebar";
 import { LiaFilterSolid } from "react-icons/lia";
-import { Circle } from "../components/StyledComponents";
+import { Circle, HeaderText } from "../components/StyledComponents";
 
 const Image = styled.img`
   padding: 8px;
@@ -15,7 +15,7 @@ const Image = styled.img`
 `;
 const ImageGridWrapper = styled.div`
   display: inline-block;
-  column-count: 3;
+  column-count: 4;
   width: 100%;
   box-sizing: border-box;
 `;
@@ -30,20 +30,7 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
-const HeaderText = styled.p`
-  margin: 0;
-  padding: 0;
-  font-size: 112px;
-  text-align: left;
-  color: white;
-`;
-const MainContainer = styled.div`
-  width: 100vw;
-  display: flex;
-  gap: 20px;
-  justify-content: space-between;
-  height: 100vh;
-`;
+
 const Gallery = () => {
   const [open, setIsOpen] = React.useState(true);
   const images = [
@@ -79,9 +66,6 @@ const Gallery = () => {
       >
         <Header>
           <HeaderText>Gallery</HeaderText>
-          <Circle light scale={open ? 0 : 1} onClick={() => setIsOpen(true)}>
-            <LiaFilterSolid />
-          </Circle>
         </Header>
         <ImageGridWrapper filterOpen={open}>
           {images.map((image, key) => (
@@ -89,7 +73,6 @@ const Gallery = () => {
           ))}
         </ImageGridWrapper>
       </div>
-      <Sidebar open={open} setIsOpen={setIsOpen} />
     </Container>
   );
 };

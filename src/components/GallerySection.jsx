@@ -1,30 +1,55 @@
-import React from 'react'
-import { Section, SectionContainer, SectionTitle } from './StyledComponents'
-import { styled } from 'styled-components';
-
+import React from "react";
+import { Section, SectionContainer, SectionTitle } from "./StyledComponents";
+import { styled } from "styled-components";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 const Image = styled.div`
-  height: 400px;
-  width: 300px;
+  width: 400px;
+  height: 300px;
   background-color: grey;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  transform-origin: center;
-  box-shadow: 0px 0px 5px rgb(73, 73, 73);
-  transition: all 0.75s cubic-bezier(0.13, 0.86, 0.26, 1);
+  display: inline-block;
+  margin: 8px;
+
+  &:first-child {
+    margin-left: 0;
+  }
+  &:last-child {
+    margin-right: 0;
+  }
+`;
+
+const ProjectsListContainer = styled.div`
+  width: 100%;
+  height: fit-content;
+  overflow-x: hidden;
+  white-space: nowrap;
+`;
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 `;
 
 const GallerySection = () => {
   return (
     <Section data-scroll-section>
-        <SectionContainer>
-          <SectionTitle data-scroll>Gallery</SectionTitle>
-          
-        </SectionContainer>
-      </Section>
-  )
-}
+      <SectionContainer>
+        <SectionTitle data-scroll>Works</SectionTitle>
+        <ProjectsListContainer>
+          <Image />
+          <Image />
+          <Image />
+          <Image />
+        </ProjectsListContainer>
+        <ButtonsContainer>
+          <FaArrowLeft size={24} />
+          <FaArrowRight size={24} />
+        </ButtonsContainer>
+      </SectionContainer>
+    </Section>
+  );
+};
 
-export default GallerySection
+export default GallerySection;

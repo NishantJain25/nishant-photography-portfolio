@@ -8,7 +8,7 @@ function App() {
   return (
     <PageProvider>
       <div className="App" id="main-container" data-scroll-container>
-        {/* <Navbar /> */}
+        <Navbar />
         <Outlet />
       </div>
     </PageProvider>
