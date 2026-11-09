@@ -126,16 +126,6 @@ const Footer = () => {
     else window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const scrollToSection = (id) => {
-    // Wait for the home page to render when navigating from another route.
-    setTimeout(() => {
-      const section = document.getElementById(id);
-      if (!section) return;
-      if (lenis) lenis.scrollTo(section);
-      else section.scrollIntoView({ behavior: "smooth" });
-    }, 50);
-  };
-
   return (
     <FooterContainer>
       <Grid>
@@ -154,12 +144,8 @@ const Footer = () => {
           <Label>Navigate</Label>
           <FooterLink to="/gallery">Gallery</FooterLink>
           <FooterLink to="/projects">My Works</FooterLink>
-          <FooterLink to="/" onClick={() => scrollToSection("services")}>
-            Services
-          </FooterLink>
-          <FooterLink to="/" onClick={() => scrollToSection("contact")}>
-            Contact
-          </FooterLink>
+          <FooterLink to="/#services">Services</FooterLink>
+          <FooterLink to="/#contact">Contact</FooterLink>
         </Cell>
 
         <Cell>

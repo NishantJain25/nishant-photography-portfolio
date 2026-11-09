@@ -29,6 +29,10 @@ const Container = styled.div`
 `;
 
 const NavItem = styled(Link)`
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
   text-decoration: none;
   letter-spacing: var(--letter-spacing-tight);
   cursor: pointer;
@@ -184,8 +188,8 @@ const Navbar = () => {
   const menuItems = [
     { name: "Gallery", to: "/gallery" },
     { name: "My Works", to: "/projects" },
-    { name: "Services", to: "/" },
-    { name: "Contact", to: "/" },
+    { name: "Services", to: "/#services" },
+    { name: "Contact", to: "/#contact" },
   ];
 
   const handleMenuClick = () => {
@@ -238,23 +242,10 @@ const Navbar = () => {
     };
   }, [location.pathname]);
 
-  const handleNavItemClick = (section) => {
-    setIsMenuOpen(false);
-    if (section) {
-      // Scroll to contact section after navigation
-      setTimeout(() => {
-        const contactSection = document.getElementById(section);
-        if (contactSection) {
-          contactSection.scrollIntoView({ behavior: "smooth" });
-        }
-      }, 50);
-    }
-  };
-
   return (
     <>
       <Container isTransparent={isTransparent} data-navbar="true">
-        <Logo to={"/"} onClick={() => handleNavItemClick("hero")}>
+        <Logo to={"/"} onClick={() => setIsMenuOpen(false)}>
           <svg
             width="32"
             height="21"
@@ -267,11 +258,11 @@ const Navbar = () => {
         </Logo>
 
         <NavItem to={"/projects"}>My Works</NavItem>
-        <NavItem to={"/"} onClick={() => handleNavItemClick("contact")}>
-          Contact Me
-        </NavItem>
+        <NavItem to={"/#contact"}>Contact Me</NavItem>
 
-        <NavItem onClick={handleMenuClick}>Menu</NavItem>
+        <NavItem as="button" type="button" onClick={handleMenuClick}>
+          Menu
+        </NavItem>
       </Container>
 
       <Backdrop isOpen={isMenuOpen} onClick={handleMenuClick} />
@@ -295,9 +286,7 @@ const Navbar = () => {
               to={item.to}
               isOpen={isMenuOpen}
               delay={index * 50}
-              onClick={() => {
-                handleNavItemClick(item.name.toLowerCase());
-              }}
+              onClick={() => setIsMenuOpen(false)}
             >
               {item.name}
             </MenuNavItem>
