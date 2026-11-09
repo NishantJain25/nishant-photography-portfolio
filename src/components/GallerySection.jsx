@@ -1,52 +1,125 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Section, SectionContainer, SectionTitle } from "./StyledComponents";
 import { styled } from "styled-components";
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import Button from "./Button";
+import { hotspotPosition, imageUrl } from "../sanity/client";
+import { FEATURED_PROJECTS_QUERY } from "../sanity/queries";
+import useSanityQuery from "../sanity/useSanityQuery";
 
-const Image = styled.div`
-  width: 400px;
-  height: 300px;
-  background-color: grey;
-  display: inline-block;
-  margin: 8px;
+// The grid's shape: one slot per featured project shown, in date order.
+const SLOTS = [
+  { rowSpan: 2, colSpan: 2, delay: 0.6, width: 1400 },
+  { rowSpan: 1, colSpan: 2, delay: 0.4, width: 1400 },
+  { rowSpan: 1, colSpan: 1, delay: 0.3, width: 800 },
+  { rowSpan: 1, colSpan: 1, delay: 0.7, width: 800 },
+];
 
-  &:first-child {
-    margin-left: 0;
-  }
-  &:last-child {
-    margin-right: 0;
-  }
+const ProjectsGrid = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
 `;
 
-const ProjectsListContainer = styled.div`
+const ProjectImage = styled.img`
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: fit-content;
-  overflow-x: hidden;
-  white-space: nowrap;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1s var(--transition-cubic-bezier);
 `;
 
-const ButtonsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
+// The gradient fades up from the bottom so the title reads on bright photos.
+const ProjectTitle = styled.div`
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--spacing-12) var(--spacing-4) var(--spacing-4);
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  text-align: left;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
+  transition: color 0.5s var(--transition-cubic-bezier);
+`;
+
+const ProjectCard = styled.div`
+  grid-row: span ${({ $rowSpan }) => $rowSpan};
+  grid-column: span ${({ $colSpan }) => $colSpan};
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 1px solid var(--color-neutral-700);
+  color: var(--color-neutral-50);
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.9);
+  animation: fadeInScale 1s var(--transition-cubic-bezier) forwards;
+  animation-delay: ${({ $delay }) => $delay}s;
+
+  &:hover {
+    ${ProjectImage} {
+      transform: scale(1.1);
+    }
+    ${ProjectTitle} {
+      color: var(--color-neutral-400);
+    }
+  }
+
+  @keyframes fadeInScale {
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 `;
 
 const GallerySection = () => {
+  const navigate = useNavigate();
+  const { data } = useSanityQuery(FEATURED_PROJECTS_QUERY);
+  const projects = (data ?? []).slice(0, SLOTS.length);
+
+  // Nothing is featured yet (or Sanity is unreachable): skip the empty heading.
+  if (projects.length === 0) return null;
+
   return (
     <Section data-scroll-section>
       <SectionContainer>
-        <SectionTitle data-scroll>Works</SectionTitle>
-        <ProjectsListContainer>
-          <Image />
-          <Image />
-          <Image />
-          <Image />
-        </ProjectsListContainer>
-        <ButtonsContainer>
-          <FaArrowLeft size={24} />
-          <FaArrowRight size={24} />
-        </ButtonsContainer>
+        <SectionTitle data-scroll>Selected Works</SectionTitle>
+        <ProjectsGrid>
+          {projects.map((project, index) => {
+            const { rowSpan, colSpan, delay, width } = SLOTS[index];
+            return (
+              <ProjectCard
+                key={project.id}
+                $rowSpan={rowSpan}
+                $colSpan={colSpan}
+                $delay={delay}
+                onClick={() => navigate(`/projects/${project.slug}`)}
+              >
+                <ProjectImage
+                  src={imageUrl(project.coverImage, width)}
+                  alt={project.coverImage.alt || project.title}
+                  loading="lazy"
+                  style={{ objectPosition: hotspotPosition(project.coverImage) }}
+                />
+                <ProjectTitle>{project.title}</ProjectTitle>
+              </ProjectCard>
+            );
+          })}
+        </ProjectsGrid>
+        <div
+          style={{ display: "flex", justifyContent: "flex-end", width: "100%" }}
+        >
+          <Button text="View All" onClick={() => navigate("/projects")} />
+        </div>
       </SectionContainer>
     </Section>
   );

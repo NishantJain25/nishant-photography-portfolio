@@ -8,7 +8,6 @@ import {
   useRef,
 } from "react";
 import Lenis from "lenis";
-import debounce from "../util/debounce";
 
 const PageContext = createContext({
   lenis: null,
@@ -16,46 +15,67 @@ const PageContext = createContext({
 
 export const PageProvider = ({ children }) => {
   const [lenis, setLenis] = useState();
-  
+
   const reqIdRef = useRef();
-  
-  useLayoutEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.5,
+
+  // Detect if device is low-end - optimized with caching
+  const isLowEndDevice = useMemo(() => {
+    if (typeof window === "undefined") return false;
+
+    // Cache the result to avoid repeated checks
+    const cached = sessionStorage.getItem("isLowEndDevice");
+    if (cached !== null) return cached === "true";
+
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    // Simple hardware detection
+    const connection =
+      navigator.connection ||
+      navigator.mozConnection ||
+      navigator.webkitConnection;
+    const isSlowConnection =
+      connection &&
+      (connection.effectiveType === "slow-2g" ||
+        connection.effectiveType === "2g" ||
+        connection.saveData);
+
+    // Check device memory (Chrome only)
+    const isLowMemory = navigator.deviceMemory && navigator.deviceMemory < 4;
+
+    const result = prefersReducedMotion || isSlowConnection || isLowMemory;
+    sessionStorage.setItem("isLowEndDevice", result.toString());
+    return result;
+  }, []);
+
+  // Optimized Lenis configuration based on device
+  const lenisConfig = useMemo(
+    () => ({
+      duration: isLowEndDevice ? 0.8 : 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       direction: "vertical",
       gestureDirection: "vertical",
-      smooth: true,
+      smooth: !isLowEndDevice,
       smoothTouch: false,
-      touchMultiplier: 5,
-    });
+      touchMultiplier: 2,
+      wheelMultiplier: isLowEndDevice ? 0.8 : 1,
+      normalizeWheel: true,
+      lerp: isLowEndDevice ? 0.15 : 0.1,
+    }),
+    [isLowEndDevice]
+  );
 
+  useLayoutEffect(() => {
+    const lenis = new Lenis(lenisConfig);
     setLenis(lenis);
-
-
-    let lastHeight = 0
-    let hideNav = false
- 
-    lenis.on('scroll', ({scroll}) => {
-        debounce(() => (lastHeight = scroll))();
-        
-        if(lastHeight < scroll && scroll > 160 && !hideNav && document.querySelector(".nav:hover") == null){
-            document.body.classList.add('hide-header')
-            hideNav = true
-        }
-
-        if(lastHeight >= scroll && scroll > 160 && hideNav){
-            document.body.classList.remove('hide-header')
-            hideNav = false
-        }
-    })
 
     return () => {
       lenis.destroy();
       setLenis(null);
-      
     };
-  }, []);
+  }, [lenisConfig]);
 
   useEffect(() => {
     const animate = (time) => {
@@ -77,10 +97,9 @@ export const PageProvider = ({ children }) => {
 
   return (
     <PageContext.Provider value={memoedValue}>{children}</PageContext.Provider>
-  )
+  );
 };
 
-
 export default function usePage() {
-    return useContext(PageContext)
+  return useContext(PageContext);
 }

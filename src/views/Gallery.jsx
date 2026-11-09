@@ -1,79 +1,50 @@
 import React from "react";
-import { styled } from "styled-components";
-import Sidebar from "../components/Sidebar";
-import { LiaFilterSolid } from "react-icons/lia";
-import { Circle, HeaderText } from "../components/StyledComponents";
-
-const Image = styled.img`
-  padding: 8px;
-  margin-bottom: 10px;
-  width: 100%;
-  height: auto;
-  max-width: 500px;
-  object-fit: contain;
-  box-sizing: border-box;
-`;
-const ImageGridWrapper = styled.div`
-  display: inline-block;
-  column-count: 4;
-  width: 100%;
-  box-sizing: border-box;
-`;
-const Container = styled.div`
-  flex: 1;
-  box-sizing: border-box;
-  display: flex;
-`;
-const Header = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
+import {
+  PageContainer,
+  SectionContainer,
+  StatusMessage,
+} from "../components/StyledComponents";
+import PageHeader from "../components/PageHeader";
+import ImageGrid from "../components/ImageGrid";
+import useSite from "../context/siteContext";
+import useSanityQuery from "../sanity/useSanityQuery";
+import { GALLERY_QUERY } from "../sanity/queries";
 
 const Gallery = () => {
-  const [open, setIsOpen] = React.useState(true);
-  const images = [
-    "desert.jpeg",
-    "hero_shot.jpeg",
-    "profile_bnw.jpg",
-    "profile_cliff.jpg",
-    "profile_coffee.jpg",
-    "profile_professional.jpg",
-    "desert.jpeg",
-    "hero_shot.jpeg",
-    "desert.jpeg",
-    "hero_shot.jpeg",
-    "profile_bnw.jpg",
-    "profile_cliff.jpg",
-    "profile_coffee.jpg",
-    "profile_professional.jpg",
-    "desert.jpeg",
-    "hero_shot.jpeg",
-  ];
+  const [selectedCategory, setSelectedCategory] = React.useState("All");
+  const { data, loading, error } = useSanityQuery(GALLERY_QUERY);
+  const { categories: siteCategories } = useSite();
+  const categories = ["All", ...siteCategories];
+
+  const images = React.useMemo(() => data ?? [], [data]);
+  const filteredImages = React.useMemo(
+    () =>
+      selectedCategory === "All"
+        ? images
+        : images.filter((image) => image.category === selectedCategory),
+    [selectedCategory, images]
+  );
 
   return (
-    <Container data-scroll-section>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          padding: "0px 24px",
-          boxSizing: "border-box",
-          gap: "48px",
-          width: "100%",
-        }}
-      >
-        <Header>
-          <HeaderText>Gallery</HeaderText>
-        </Header>
-        <ImageGridWrapper filterOpen={open}>
-          {images.map((image, key) => (
-            <Image src={require(`../assets/gallery/${image}`)} key={key} />
-          ))}
-        </ImageGridWrapper>
-      </div>
-    </Container>
+    <>
+      <PageContainer data-scroll-section id="page-container">
+        <SectionContainer id="section-container" justify="flex-start">
+          <PageHeader
+            title="Gallery"
+            itemCount={images.length}
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+          />
+          {loading && <StatusMessage>Loading photos...</StatusMessage>}
+          {error && <StatusMessage>Couldn't load the gallery.</StatusMessage>}
+          {data && filteredImages.length === 0 && (
+            <StatusMessage>No photos here yet.</StatusMessage>
+          )}
+          <ImageGrid images={filteredImages} />
+        </SectionContainer>
+      </PageContainer>
+    </>
   );
 };
 
