@@ -21,6 +21,11 @@ const SubmitButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 `;
 
 const SubmitText = styled.span`
@@ -86,11 +91,11 @@ const SubmitButtonContainer = styled.div`
   }
 `;
 
-const Button = ({ text, Icon, onClick }) => {
+const Button = ({ text, Icon, onClick, type = "button", disabled = false }) => {
   return (
     <SubmitButtonContainer onClick={onClick}>
       <WidthSizer aria-hidden="true">{text}</WidthSizer>
-      <SubmitButton>
+      <SubmitButton type={type} disabled={disabled}>
         <SubmitText>{text}</SubmitText>
 
         <IconElement>{Icon ?? <HiArrowRight />}</IconElement>

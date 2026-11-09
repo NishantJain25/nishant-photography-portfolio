@@ -4,6 +4,7 @@ import {
   Row,
   Section,
   SectionRowContainer,
+  StatusMessage,
 } from "./StyledComponents";
 import { styled } from "styled-components";
 import { FaRegEnvelope, FaRegCopy } from "react-icons/fa";
@@ -25,12 +26,25 @@ const StyledInput = styled.input`
   border: none;
   border-bottom: 1px solid white;
   height: 35px;
+  font: inherit;
   outline: none;
 
   &:focus {
     outline: none;
     background-color: transparent;
   }
+`;
+
+const StyledTextarea = styled(StyledInput).attrs({ as: "textarea" })`
+  height: auto;
+  padding: var(--spacing-2) 0;
+  resize: none;
+`;
+
+const ContactForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
 `;
 
 const InputLabel = styled.label`
@@ -163,6 +177,7 @@ const ContactSection = () => {
   const [isPortalVisible, setIsPortalVisible] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const [portalPosition, setPortalPosition] = useState("bottom");
+  const [formStatus, setFormStatus] = useState("idle");
   const { settings } = useSite();
   const email = settings?.email;
   const emailContainerRef = React.useRef(null);
@@ -201,6 +216,25 @@ const ContactSection = () => {
 
   const handleOpenEmailClient = () => {
     window.location.href = `mailto:${email}`;
+  };
+
+  // Netlify picks up form posts sent to the site root.
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    setFormStatus("sending");
+    try {
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(new FormData(form)).toString(),
+      });
+      if (!response.ok) throw new Error("Form post failed");
+      form.reset();
+      setFormStatus("sent");
+    } catch {
+      setFormStatus("error");
+    }
   };
 
   return (
@@ -245,17 +279,47 @@ const ContactSection = () => {
           )}
         </CtaBlock>
         <FormContainer>
-          <div>
-            <InputLabel for={"email"}>Your email</InputLabel>
-            <StyledInput name={"email"} />
-          </div>
-          <div>
-            <InputLabel for="message">Message</InputLabel>
-            <StyledInput name="message" />
-          </div>
-          <div>
-            <Button text={"Submit"} />
-          </div>
+          <ContactForm name="contact" onSubmit={handleSubmit}>
+            <input type="hidden" name="form-name" value="contact" />
+            {/* Spam trap: hidden from people, and Netlify drops anything that fills it. */}
+            <input name="company" tabIndex={-1} autoComplete="off" hidden />
+            <div>
+              <InputLabel htmlFor="contact-email">Your email</InputLabel>
+              <StyledInput
+                id="contact-email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+              />
+            </div>
+            <div>
+              <InputLabel htmlFor="contact-message">Message</InputLabel>
+              <StyledTextarea
+                id="contact-message"
+                name="message"
+                rows={3}
+                required
+              />
+            </div>
+            <div>
+              <Button
+                type="submit"
+                text={formStatus === "sending" ? "Sending..." : "Submit"}
+                disabled={formStatus === "sending"}
+              />
+            </div>
+            <div role="status">
+              {formStatus === "sent" && (
+                <StatusMessage>Thanks! I'll get back to you soon.</StatusMessage>
+              )}
+              {formStatus === "error" && (
+                <StatusMessage>
+                  That didn't send. Please email me directly instead.
+                </StatusMessage>
+              )}
+            </div>
+          </ContactForm>
           <Divider />
           <Column>
             <Column>

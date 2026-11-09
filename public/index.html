@@ -33,6 +33,15 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <!--
+      Netlify finds forms by reading this file at deploy time, and can't see ones
+      React renders later. Keep these fields in sync with ContactSection.jsx.
+    -->
+    <form name="contact" data-netlify="true" data-netlify-honeypot="company" hidden>
+      <input name="email" />
+      <textarea name="message"></textarea>
+      <input name="company" />
+    </form>
     <div id="root"></div>
     <!--
       This HTML file is a template.
