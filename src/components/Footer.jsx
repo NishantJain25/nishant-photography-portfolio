@@ -5,9 +5,9 @@ import usePage from "../context/pageContext";
 import useSite from "../context/siteContext";
 
 const FooterContainer = styled.footer`
-  width: calc(100% - 48px);
+  width: calc(100% - 2 * var(--page-gutter));
   box-sizing: border-box;
-  margin: 0 24px;
+  margin: 0 var(--page-gutter);
   border: 1px solid var(--color-neutral-700);
   border-top: none;
 `;
@@ -17,11 +17,12 @@ const Grid = styled.div`
   grid-template-columns: 1.4fr 1fr 1fr 1fr;
 
   @media (max-width: 768px) {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 `;
 
 const Cell = styled.div`
+  min-width: 0;
   padding: var(--spacing-8) var(--spacing-6);
   display: flex;
   flex-direction: column;
@@ -32,11 +33,19 @@ const Cell = styled.div`
     border-right: none;
   }
 
+  /* Name and email get full rows, with the two link lists side by side between. */
   @media (max-width: 768px) {
-    &:nth-child(2n) {
+    padding: var(--spacing-6) var(--page-gutter);
+
+    &:first-child,
+    &:last-child {
+      grid-column: 1 / -1;
       border-right: none;
     }
-    &:nth-child(-n + 2) {
+    &:nth-child(3) {
+      border-right: none;
+    }
+    &:not(:last-child) {
       border-bottom: 1px solid var(--color-neutral-700);
     }
   }
@@ -78,14 +87,15 @@ const FooterLink = styled(Link)`
 
 const ExternalLink = styled.a`
   ${linkStyles}
-  word-break: break-all;
+  overflow-wrap: anywhere;
 `;
 
 const BottomRow = styled.div`
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: var(--spacing-4);
+  gap: var(--spacing-2) var(--spacing-4);
   padding: var(--spacing-4) var(--spacing-6);
   border-top: 1px solid var(--color-neutral-700);
   color: var(--color-neutral-400);

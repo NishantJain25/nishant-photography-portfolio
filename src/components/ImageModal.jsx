@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import InfoGrid from "./InfoGrid";
 import Modal from "./Modal";
-import { imageUrl } from "../sanity/client";
+import { responsiveImage } from "../sanity/client";
 import { formatDate } from "../util/formatDate";
 
 const ModalImage = styled.img`
@@ -27,6 +27,12 @@ const TextContainer = styled.div`
   color: var(--color-neutral-50);
   text-align: left;
   gap: 16px;
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    height: auto;
+    padding: 0;
+  }
 `;
 
 const ButtonRow = styled.div`
@@ -53,12 +59,21 @@ const ImageView = styled.div`
   grid-template-columns: ${({ $hasDetails }) =>
     $hasDetails ? "3fr 2fr" : "1fr"};
   background-color: transparent;
-  gap: var(--spacing-16);
+  gap: clamp(var(--spacing-6), 4vw, var(--spacing-16));
+
+  /* The photo takes whatever height the details leave free. */
+  @media (max-width: 768px) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: ${({ $hasDetails }) =>
+      $hasDetails ? "minmax(0, 1fr) auto" : "minmax(0, 1fr)"};
+    gap: var(--spacing-4);
+  }
 `;
 
 const ImageViewContainer = styled.div`
   height: 100%;
   width: 100%;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -106,8 +121,11 @@ const ImageModal = ({ isOpen, onClose, image, modalContent = null }) => {
         <ImageView $hasDetails={Boolean(hasDetails)}>
           <ImageViewContainer>
             <ModalImage
-              src={imageUrl(image.image, 2000)}
               alt={image.alt || caption || title || ""}
+              {...responsiveImage(
+                image.image,
+                hasDetails ? "(max-width: 768px) 100vw, 60vw" : "100vw"
+              )}
             />
           </ImageViewContainer>
           {modalContent || (hasDetails && defaultContent)}

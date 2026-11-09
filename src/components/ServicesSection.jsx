@@ -6,25 +6,28 @@ import Button from "./Button";
 import useSite from "../context/siteContext";
 
 
-// Grow past one screen when the copy needs more room.
-const AboutSection = styled(Section)`
-  height: auto;
-  min-height: 100vh;
-`;
-
 const Container = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 48px;
-  min-height: 100vh;
-  padding: 48px 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--section-spacing);
+  flex: 1;
+  padding: var(--section-spacing) var(--page-gutter);
   box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 `;
 
 const LeftSection = styled.div`
   position: relative;
   width: 100%;
   overflow: hidden;
+
+  /* Stacked, the photo no longer gets its height from the text beside it. */
+  @media (max-width: 768px) {
+    aspect-ratio: 4 / 5;
+  }
 
   img {
     position: absolute;
@@ -48,6 +51,10 @@ const TextContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: var(--spacing-6);
+
+  @media (max-width: 1024px) {
+    width: 100%;
+  }
 `;
 
 const Eyebrow = styled.p`
@@ -106,7 +113,7 @@ const ServicesList = styled.ul`
 const CtaRow = styled.div`
   display: flex;
   align-items: center;
-  gap: var(--spacing-16);
+  gap: var(--spacing-4) var(--spacing-16);
   flex-wrap: wrap;
   margin-top: var(--spacing-4);
 `;
@@ -120,7 +127,7 @@ const ServicesSection = () => {
   const { categories } = useSite();
 
   return (
-    <AboutSection data-scroll-section id="services">
+    <Section data-scroll-section id="services">
       <Container>
         <LeftSection>
           <img src={Profile} alt="Nishant Jain" loading="lazy" />
@@ -153,7 +160,7 @@ const ServicesSection = () => {
           </TextContainer>
         </RightSection>
       </Container>
-    </AboutSection>
+    </Section>
   );
 };
 

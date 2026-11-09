@@ -11,8 +11,11 @@ const CategoryContainer = styled.div`
   backdrop-filter: blur(10px);
   padding: var(--spacing-4);
   border-radius: var(--border-radius-base);
-  @media (max-width: 768px) {
+
+  /* Wraps below the page title here, so it lines up with the title's left edge. */
+  @media (max-width: 1024px) {
     width: 100%;
+    padding: 0;
   }
 `;
 

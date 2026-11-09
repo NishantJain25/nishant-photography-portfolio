@@ -10,24 +10,93 @@ import styled from "styled-components";
 import ImageGrid from "../components/ImageGrid";
 import InfoGrid from "../components/InfoGrid";
 import { formatDate } from "../util/formatDate";
-import { hotspotPosition, imageUrl } from "../sanity/client";
+import { hotspotPosition, responsiveImage } from "../sanity/client";
 import { PROJECT_QUERY } from "../sanity/queries";
 import useSanityQuery from "../sanity/useSanityQuery";
 
+// How wide these photos display, matching the layouts below.
+const COVER_SIZES = "100vw";
+const SIDE_IMAGE_SIZES = "(max-width: 768px) 100vw, 33vw";
+
 const CoverImageContainer = styled.div`
+  position: relative;
   width: 100%;
-  height: 100vh;
+  height: var(--screen-height);
   background-color: aliceblue;
   overflow: hidden;
   border-bottom: 1px solid var(--color-neutral-700);
   border-top: ${({ isBody }) => isBody && `1px solid var(--color-neutral-700)`};
+
+  /* A full-screen photo in the middle of the page is too much scrolling on phones. */
+  @media (max-width: 768px) {
+    height: ${({ isBody }) => (isBody ? "70vw" : "var(--screen-height)")};
+  }
+`;
+
+const CoverTitle = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 var(--spacing-4);
+  text-align: center;
+  font-size: var(--font-size-6xl);
+  line-height: 1.1;
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--letter-spacing-tight);
 `;
 
 const Grid = styled.div`
   display: grid;
   width: 100%;
   grid-template-columns: repeat(6, 1fr);
-  gap: ${({ gap }) => gap && `var(--spacing-${gap})`};
+  gap: var(--spacing-4);
+
+  @media (max-width: 768px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-6);
+  }
+`;
+
+const DescriptionCell = styled.div`
+  grid-column: 1 / 4;
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-snug);
+
+  @media (max-width: 768px) {
+    grid-column: auto;
+  }
+`;
+
+const InfoCell = styled.div`
+  grid-column: 1 / 4;
+  grid-row: 3 / 4;
+
+  @media (max-width: 768px) {
+    grid-column: auto;
+    grid-row: auto;
+  }
+`;
+
+const SideImageCell = styled.div`
+  grid-column: 5 / 7;
+  grid-row: 1 / 4;
+
+  img {
+    width: 100%;
+    border: 1px solid var(--color-neutral-700);
+  }
+
+  /* On phones it follows the details rather than splitting them up. */
+  @media (max-width: 768px) {
+    grid-column: auto;
+    grid-row: auto;
+    order: 1;
+  }
 `;
 
 const StatusPage = ({ children }) => (
@@ -67,8 +136,8 @@ const ProjectDetails = () => {
     <>
       <CoverImageContainer className="cover-img">
         <img
-          src={imageUrl(coverImage, 2400)}
           alt={coverImage.alt || project.title}
+          fetchPriority="high"
           style={{
             width: "100%",
             height: "100%",
@@ -76,56 +145,24 @@ const ProjectDetails = () => {
             objectPosition: hotspotPosition(coverImage),
             filter: "brightness(0.75)",
           }}
+          {...responsiveImage(coverImage, COVER_SIZES)}
         />
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
-            height: "100%",
-            textAlign: "center",
-            fontSize: "var(--font-size-6xl)",
-            fontWeight: "var(--font-weight-regular)",
-            letterSpacing: "var(--letter-spacing-tight)",
-          }}
-        >
-          {project.title}
-        </div>
+        <CoverTitle>{project.title}</CoverTitle>
       </CoverImageContainer>
       <PageContainer style={{ borderTop: "none", borderBottom: "none" }}>
         <SectionContainer>
-          <Grid gap={4}>
-            <div
-              style={{ fontSize: "var(--font-size-3xl)", gridColumn: "1 / 4" }}
-            >
-              {project.description}
-            </div>
+          <Grid>
+            <DescriptionCell>{project.description}</DescriptionCell>
 
             {sideImage && (
-              <div
-                style={{
-                  fontSize: "var(--font-size-3xl)",
-                  gridColumn: "5 / 7",
-                  gridRow: "1 / 4",
-                }}
-              >
+              <SideImageCell>
                 <img
-                  src={imageUrl(sideImage.image, 1000)}
                   alt={sideImage.alt || sideImage.caption || ""}
-                  style={{ border: "1px solid var(--color-neutral-700)" }}
+                  {...responsiveImage(sideImage.image, SIDE_IMAGE_SIZES)}
                 />
-              </div>
+              </SideImageCell>
             )}
-            <div
-              style={{
-                gridColumn: "1 / 4",
-                gridRow: "3/4",
-              }}
-            >
+            <InfoCell>
               <InfoGrid
                 rows={[
                   { label: "Category", value: project.category },
@@ -135,7 +172,7 @@ const ProjectDetails = () => {
                   },
                 ]}
               />
-            </div>
+            </InfoCell>
           </Grid>
         </SectionContainer>
       </PageContainer>
@@ -144,7 +181,6 @@ const ProjectDetails = () => {
         <>
           <CoverImageContainer isBody className="cover-img">
             <img
-              src={imageUrl(bodyImage.image, 2400)}
               alt={bodyImage.alt || bodyImage.caption || ""}
               style={{
                 width: "100%",
@@ -152,6 +188,7 @@ const ProjectDetails = () => {
                 objectFit: "cover",
                 objectPosition: hotspotPosition(bodyImage.image),
               }}
+              {...responsiveImage(bodyImage.image, COVER_SIZES)}
             />
           </CoverImageContainer>
           <PageContainer style={{ borderTop: "none" }}>

@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Link, useLocation } from "react-router-dom";
-import { FaTimes } from "react-icons/fa";
+import { FaInstagram, FaRegEnvelope, FaTimes } from "react-icons/fa";
+import { HoverMenu, HoverMenuIcon, HoverMenuOption } from "./HoverMenu";
+import useSite from "../context/siteContext";
 
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0px 24px;
-  padding: 8px 24px;
+  gap: var(--spacing-3);
+  margin: 0 var(--page-gutter);
+  padding: 8px var(--page-gutter);
   border-bottom: ${({ isTransparent }) =>
     isTransparent ? "none" : "1px solid var(--color-neutral-700)"};
   border-left: ${({ isTransparent }) =>
@@ -18,7 +21,7 @@ const Container = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  width: calc(100% - 48px);
+  width: calc(100% - 2 * var(--page-gutter));
   box-sizing: border-box;
   background-color: ${({ isTransparent }) =>
     isTransparent ? "transparent" : "black"};
@@ -58,15 +61,36 @@ const Column = styled.div`
   justify-content: center;
   align-items: flex-start;
   gap: var(--spacing-1);
-  padding: 0 var(--spacing-16);
+  padding: 0 clamp(var(--spacing-6), 5vw, var(--spacing-16));
+`;
+
+const LogoColumn = styled(Column)`
+  align-items: center;
+`;
+
+const MenuLogoWrapper = styled.div`
+  position: relative;
+  display: flex;
+`;
+
+const MenuLogo = styled.img`
+  width: 120px;
+  height: auto;
+`;
+
+const MenuLogoPopup = styled(HoverMenu)`
+  left: 50%;
+  width: 150px;
+  margin-left: -75px;
 `;
 
 const MenuOverlay = styled.div`
   position: fixed;
   top: 0;
   right: 0;
-  width: 30%;
+  width: max(320px, 30%);
   height: 100vh;
+  height: 100dvh;
   background-color: black;
   border-left: 1px solid var(--color-neutral-700);
   display: flex;
@@ -87,6 +111,7 @@ const Backdrop = styled.div`
   left: 0;
   width: 100%;
   height: 100vh;
+  height: 100dvh;
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(5px);
   z-index: 999;
@@ -148,7 +173,13 @@ const CloseButton = styled.button`
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTransparent, setIsTransparent] = useState(false);
+  const [isLogoPopupVisible, setIsLogoPopupVisible] = useState(false);
   const location = useLocation();
+  const { settings } = useSite();
+  const email = settings?.email;
+  const instagram = settings?.socialLinks.find(
+    ({ platform }) => platform === "Instagram"
+  );
 
   const menuItems = [
     { name: "Gallery", to: "/gallery" },
@@ -272,7 +303,45 @@ const Navbar = () => {
             </MenuNavItem>
           ))}
         </Column>
-        <Column></Column>
+        <LogoColumn>
+          <MenuLogoWrapper
+            onMouseEnter={() => setIsLogoPopupVisible(true)}
+            onMouseLeave={() => setIsLogoPopupVisible(false)}
+          >
+            <MenuLogo
+              src={`${process.env.PUBLIC_URL}/logo.svg`}
+              alt="Nishant Jain logo"
+            />
+            {(email || instagram) && (
+              <MenuLogoPopup
+                isVisible={isMenuOpen && isLogoPopupVisible}
+                position="top"
+              >
+                {email && (
+                  <HoverMenuOption as="a" href={`mailto:${email}`}>
+                    <HoverMenuIcon>
+                      <FaRegEnvelope />
+                    </HoverMenuIcon>
+                    Email
+                  </HoverMenuOption>
+                )}
+                {instagram && (
+                  <HoverMenuOption
+                    as="a"
+                    href={instagram.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <HoverMenuIcon>
+                      <FaInstagram />
+                    </HoverMenuIcon>
+                    Instagram
+                  </HoverMenuOption>
+                )}
+              </MenuLogoPopup>
+            )}
+          </MenuLogoWrapper>
+        </LogoColumn>
       </MenuOverlay>
     </>
   );

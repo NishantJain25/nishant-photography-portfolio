@@ -3,11 +3,19 @@ import { Section, SectionContainer } from "./StyledComponents";
 import styled from "styled-components";
 import HeroImage from "../assets/gallery/profile_yellow.webp";
 
+// Stops the fixed navbar covering the photo when the content fills the screen.
+const HeroContainer = styled(SectionContainer)`
+  @media (max-width: 768px), (max-height: 600px) {
+    padding-top: calc(var(--section-spacing) + var(--spacing-10));
+  }
+`;
+
 const Heading = styled.div`
   display: flex;
   justify-content: center;
   width: fit-content;
-  font-size: 14vw;
+  font-size: 12vw;
+  font-size: 15.5cqw;
   letter-spacing: var(--letter-spacing-tighter);
   font-weight: var(--font-weight-regular);
   color: white;
@@ -15,7 +23,9 @@ const Heading = styled.div`
   line-height: 100%;
 `;
 
+// Sized to this box instead of the screen, so the name always spans it exactly.
 const TitleContainer = styled.div`
+  container-type: inline-size;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -27,12 +37,18 @@ const ImageContainer = styled.div`
   width: 100%;
   height: 50vh;
   overflow: hidden;
+
+  /* A fixed shape, since a share of the screen height can come out nearly square. */
+  @media (max-width: 600px) {
+    height: auto;
+    aspect-ratio: 3 / 4;
+  }
 `;
 
 const HeroSection = () => {
   return (
     <Section data-scroll-section id="hero">
-      <SectionContainer>
+      <HeroContainer>
         <ImageContainer>
           <img
             src={HeroImage}
@@ -45,7 +61,7 @@ const HeroSection = () => {
           <Heading>NISHANT</Heading>
           <Heading>JAIN</Heading>
         </TitleContainer>
-      </SectionContainer>
+      </HeroContainer>
     </Section>
   );
 };

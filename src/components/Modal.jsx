@@ -22,6 +22,10 @@ const ModalContent = styled.div`
   background-color: transparent;
   padding: var(--spacing-12);
   z-index: 1001;
+
+  @media (max-width: 768px) {
+    padding: var(--spacing-12) var(--spacing-4) var(--spacing-4);
+  }
 `;
 
 const Overlay = styled.div`

@@ -13,8 +13,28 @@ export const client = projectId
 const builder = client && createImageUrlBuilder(client);
 
 // fit("max") stops the CDN from upscaling photos smaller than `width`.
-export const imageUrl = (image, width) =>
+const imageUrl = (image, width) =>
   builder.image(image).width(width).fit("max").auto("format").url();
+
+const IMAGE_WIDTHS = [400, 640, 800, 1000, 1400, 2000, 2400];
+
+// Props for <img> that let the browser download the smallest version that looks
+// sharp. `sizes` says how wide the image displays, e.g. "(max-width: 768px) 100vw, 50vw".
+// The order matters: browsers can start fetching `src` as soon as it's set, so
+// `srcSet` and `sizes` have to come first.
+export const responsiveImage = (image, sizes) => {
+  const original = Number(imageSize(image).width);
+  const widths = IMAGE_WIDTHS.filter((width) => width < original);
+  if (original <= IMAGE_WIDTHS[IMAGE_WIDTHS.length - 1]) widths.push(original);
+
+  return {
+    sizes,
+    srcSet: widths
+      .map((width) => `${imageUrl(image, width)} ${width}w`)
+      .join(", "),
+    src: imageUrl(image, 1000),
+  };
+};
 
 // The CDN only crops to the hotspot when given both a width and a height, so
 // for images sized by CSS `object-fit: cover`, apply it with this instead.

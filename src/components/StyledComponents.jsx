@@ -4,48 +4,57 @@ export const Row = styled.div`
   gap: ${({ gap }) => (gap ? `var(--spacing-${gap})` : null)};
 `;
 
+// At least one screen tall, growing when the content needs more room.
 export const Section = styled.section`
-  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: var(--screen-height);
   box-sizing: border-box;
-  margin: 0 24px;
+  margin: 0 var(--page-gutter);
   border: 1px solid var(--color-neutral-700);
 `;
 
 export const SectionContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--spacing-6);
   justify-content: ${({ justify }) => (justify ? justify : "center")};
   align-items: ${({ align }) => (align ? align : "flex-start")};
   height: 100%;
-  padding: 48px 24px;
+  padding: var(--section-spacing) var(--page-gutter);
   box-sizing: border-box;
   flex: 1;
+  min-width: 0;
+  min-height: 0;
 `;
 export const SectionRowContainer = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-16);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(var(--spacing-8), 5vw, var(--spacing-16));
   align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  padding: 0 24px;
+  flex: 1;
+  padding: var(--section-spacing) var(--page-gutter);
   box-sizing: border-box;
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+  }
 `;
 
 export const SectionTitle = styled.p`
   font-size: var(--font-size-7xl);
+  line-height: 1.1;
   color: white;
   margin: 0;
-  display: flex;
 `;
 
 export const PageContainer = styled.div`
-  min-height: 100vh;
+  min-height: var(--screen-height);
   flex: 1;
   box-sizing: border-box;
   display: flex;
-  margin: 0 24px;
+  margin: 0 var(--page-gutter);
   border: 1px solid var(--color-neutral-700);
 `;
 
@@ -69,8 +78,8 @@ export const Header = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin: var(--spacing-24) 0;
-  gap: var(--spacing-8);
+  margin: clamp(var(--spacing-12), 9vw, var(--spacing-24)) 0;
+  gap: clamp(var(--spacing-4), 3vw, var(--spacing-8));
   flex-wrap: wrap;
   position: relative;
 `;
@@ -91,16 +100,16 @@ export const HeaderText = styled.p`
   letter-spacing: var(--letter-spacing-tight);
 `;
 
+// How wide a photo displays in ImageGridWrapper, matching its column counts below.
+export const IMAGE_GRID_SIZES =
+  "(max-width: 480px) 100vw, (max-width: 768px) 50vw, 33vw";
+
 export const ImageGridWrapper = styled.div`
   column-count: ${({ columnCount }) => columnCount ?? 3};
   column-gap: 16px;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-
-  @media (max-width: 1200px) {
-    column-count: ${({ columnCount }) => columnCount ?? 3};
-  }
 
   @media (max-width: 768px) {
     column-count: 2;

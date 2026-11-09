@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Divider,
   Row,
   Section,
   SectionRowContainer,
-  StatusMessage,
 } from "./StyledComponents";
 import { styled } from "styled-components";
 import { FaRegEnvelope, FaRegCopy } from "react-icons/fa";
 import Button from "./Button";
+import { HoverMenu, HoverMenuIcon, HoverMenuOption } from "./HoverMenu";
 import { SOCIAL_ICONS } from "../constants/socialIcons";
 import useSite from "../context/siteContext";
 
@@ -45,6 +45,27 @@ const ContactForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: var(--spacing-5);
+`;
+
+// The fixed height stops the page jumping when a message appears or vanishes.
+const FormMessage = styled.div`
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  min-height: 24px;
+  font-size: var(--font-size-sm);
+  color: ${({ $isError }) =>
+    $isError ? "var(--color-error)" : "var(--color-neutral-400)"};
+`;
+
+const DismissButton = styled.button`
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: var(--font-size-xl);
+  line-height: 1;
+  cursor: pointer;
 `;
 
 const InputLabel = styled.label`
@@ -87,49 +108,12 @@ const EmailContainer = styled.div`
 
 const EmailText = styled.h3`
   margin: 0;
+  overflow-wrap: anywhere;
   cursor: pointer;
   transition: text-decoration 0.3s ease;
 
   &:hover {
     text-decoration: underline;
-  }
-`;
-
-const EmailPortal = styled.div`
-  position: absolute;
-  ${({ position }) =>
-    position === "top"
-      ? `bottom: calc(100% + 12px); top: auto;`
-      : `top: calc(100% + 12px); bottom: auto;`}
-  left: 0;
-  background-color: black;
-  border: 1px solid var(--color-neutral-700);
-  padding: 0;
-  min-width: 150px;
-  z-index: 1000;
-  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
-  visibility: ${({ isVisible }) => (isVisible ? "visible" : "hidden")};
-  transform: translateY(
-    ${({ isVisible, position }) =>
-      isVisible ? "0" : position === "top" ? "10px" : "-10px"}
-  );
-  transition: all 0.5s var(--transition-cubic-bezier) 0.5s;
-`;
-
-const PortalOption = styled.div`
-  padding: 16px;
-  cursor: pointer;
-  color: var(--color-neutral-50);
-  font-size: var(--font-size-sm);
-  transition: background-color 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  &:hover {
-    background-color: var(--color-neutral-700);
-  }
-  &:first-child {
-    border-bottom: 1px solid var(--color-neutral-700);
   }
 `;
 
@@ -167,12 +151,6 @@ const CtaAccent = styled.a`
   }
 `;
 
-const IconWrapper = styled.div`
-  color: var(--color-neutral-400);
-  display: flex;
-  align-items: center;
-`;
-
 const ContactSection = () => {
   const [isPortalVisible, setIsPortalVisible] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -181,6 +159,13 @@ const ContactSection = () => {
   const { settings } = useSite();
   const email = settings?.email;
   const emailContainerRef = React.useRef(null);
+
+  // Errors stay until closed, since they tell the visitor what to do next.
+  useEffect(() => {
+    if (formStatus !== "sent") return;
+    const timer = setTimeout(() => setFormStatus("idle"), 3000);
+    return () => clearTimeout(timer);
+  }, [formStatus]);
 
   const calculatePortalPosition = () => {
     if (!emailContainerRef.current) return "bottom";
@@ -257,23 +242,20 @@ const ContactSection = () => {
                 onMouseLeave={handleEmailLeave}
               >
                 <EmailText>{email}</EmailText>
-                <EmailPortal
-                  isVisible={isPortalVisible}
-                  position={portalPosition}
-                >
-                  <PortalOption onClick={handleCopyEmail}>
-                    <IconWrapper>
+                <HoverMenu isVisible={isPortalVisible} position={portalPosition}>
+                  <HoverMenuOption onClick={handleCopyEmail}>
+                    <HoverMenuIcon>
                       <FaRegCopy />
-                    </IconWrapper>
+                    </HoverMenuIcon>
                     {copySuccess ? "Copied!" : "Copy email"}
-                  </PortalOption>
-                  <PortalOption onClick={handleOpenEmailClient}>
-                    <IconWrapper>
+                  </HoverMenuOption>
+                  <HoverMenuOption onClick={handleOpenEmailClient}>
+                    <HoverMenuIcon>
                       <FaRegEnvelope />
-                    </IconWrapper>
+                    </HoverMenuIcon>
                     Open email client
-                  </PortalOption>
-                </EmailPortal>
+                  </HoverMenuOption>
+                </HoverMenu>
               </EmailContainer>
             </Column>
           )}
@@ -309,16 +291,21 @@ const ContactSection = () => {
                 disabled={formStatus === "sending"}
               />
             </div>
-            <div role="status">
-              {formStatus === "sent" && (
-                <StatusMessage>Thanks! I'll get back to you soon.</StatusMessage>
-              )}
+            <FormMessage role="status" $isError={formStatus === "error"}>
+              {formStatus === "sent" && "Thanks! I'll get back to you soon."}
               {formStatus === "error" && (
-                <StatusMessage>
+                <>
                   That didn't send. Please email me directly instead.
-                </StatusMessage>
+                  <DismissButton
+                    type="button"
+                    aria-label="Dismiss message"
+                    onClick={() => setFormStatus("idle")}
+                  >
+                    &times;
+                  </DismissButton>
+                </>
               )}
-            </div>
+            </FormMessage>
           </ContactForm>
           <Divider />
           <Column>

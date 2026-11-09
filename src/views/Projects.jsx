@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  IMAGE_GRID_SIZES,
   ImageGridWrapper,
   PageContainer,
   SectionContainer,
@@ -9,7 +10,7 @@ import PageHeader from "../components/PageHeader";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import useSite from "../context/siteContext";
-import { imageSize, imageUrl } from "../sanity/client";
+import { imageSize, responsiveImage } from "../sanity/client";
 import { PROJECTS_QUERY } from "../sanity/queries";
 import useSanityQuery from "../sanity/useSanityQuery";
 
@@ -107,10 +108,10 @@ const Projects = () => {
             >
               <ImageContainer>
                 <Image
-                  src={imageUrl(project.coverImage, 1000)}
                   alt={project.coverImage.alt || project.title}
                   loading="lazy"
                   {...imageSize(project.coverImage)}
+                  {...responsiveImage(project.coverImage, IMAGE_GRID_SIZES)}
                 />
               </ImageContainer>
               <ProjectDetails>

@@ -3,17 +3,34 @@ import { useNavigate } from "react-router-dom";
 import { Section, SectionContainer, SectionTitle } from "./StyledComponents";
 import { styled } from "styled-components";
 import Button from "./Button";
-import { hotspotPosition, imageUrl } from "../sanity/client";
+import { hotspotPosition, responsiveImage } from "../sanity/client";
 import { FEATURED_PROJECTS_QUERY } from "../sanity/queries";
 import useSanityQuery from "../sanity/useSanityQuery";
 
+// How wide each card displays, matching the grid's breakpoints below.
+const WIDE_CARD_SIZES = "(max-width: 1024px) 100vw, 50vw";
+const SMALL_CARD_SIZES =
+  "(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 25vw";
+
 // The grid's shape: one slot per featured project shown, in date order.
 const SLOTS = [
-  { rowSpan: 2, colSpan: 2, delay: 0.6, width: 1400 },
-  { rowSpan: 1, colSpan: 2, delay: 0.4, width: 1400 },
-  { rowSpan: 1, colSpan: 1, delay: 0.3, width: 800 },
-  { rowSpan: 1, colSpan: 1, delay: 0.7, width: 800 },
+  { rowSpan: 2, colSpan: 2, delay: 0.6, sizes: WIDE_CARD_SIZES },
+  { rowSpan: 1, colSpan: 2, delay: 0.4, sizes: WIDE_CARD_SIZES },
+  { rowSpan: 1, colSpan: 1, delay: 0.3, sizes: SMALL_CARD_SIZES },
+  { rowSpan: 1, colSpan: 1, delay: 0.7, sizes: SMALL_CARD_SIZES },
 ];
+
+// The cards fill exactly one screen on large displays. Elsewhere that would make
+// them too small, so the section grows and the cards set their own height.
+const STACKED = "(max-width: 1024px), (max-height: 600px)";
+
+const WorksSection = styled(Section)`
+  height: var(--screen-height);
+
+  @media ${STACKED} {
+    height: auto;
+  }
+`;
 
 const ProjectsGrid = styled.div`
   width: 100%;
@@ -23,6 +40,16 @@ const ProjectsGrid = styled.div`
   gap: 8px;
   flex: 1;
   min-height: 0;
+
+  @media ${STACKED} {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: clamp(220px, 36vw, 380px);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: 70vw;
+  }
 `;
 
 const ProjectImage = styled.img`
@@ -64,6 +91,14 @@ const ProjectCard = styled.div`
   animation: fadeInScale 1s var(--transition-cubic-bezier) forwards;
   animation-delay: ${({ $delay }) => $delay}s;
 
+  @media ${STACKED} {
+    grid-row: auto;
+  }
+
+  @media (max-width: 600px) {
+    grid-column: auto;
+  }
+
   &:hover {
     ${ProjectImage} {
       transform: scale(1.1);
@@ -90,12 +125,12 @@ const GallerySection = () => {
   if (projects.length === 0) return null;
 
   return (
-    <Section data-scroll-section>
+    <WorksSection data-scroll-section>
       <SectionContainer>
         <SectionTitle data-scroll>Selected Works</SectionTitle>
         <ProjectsGrid>
           {projects.map((project, index) => {
-            const { rowSpan, colSpan, delay, width } = SLOTS[index];
+            const { rowSpan, colSpan, delay, sizes } = SLOTS[index];
             return (
               <ProjectCard
                 key={project.id}
@@ -105,10 +140,10 @@ const GallerySection = () => {
                 onClick={() => navigate(`/projects/${project.slug}`)}
               >
                 <ProjectImage
-                  src={imageUrl(project.coverImage, width)}
                   alt={project.coverImage.alt || project.title}
                   loading="lazy"
                   style={{ objectPosition: hotspotPosition(project.coverImage) }}
+                  {...responsiveImage(project.coverImage, sizes)}
                 />
                 <ProjectTitle>{project.title}</ProjectTitle>
               </ProjectCard>
@@ -121,7 +156,7 @@ const GallerySection = () => {
           <Button text="View All" onClick={() => navigate("/projects")} />
         </div>
       </SectionContainer>
-    </Section>
+    </WorksSection>
   );
 };
 
