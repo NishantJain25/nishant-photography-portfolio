@@ -45,8 +45,13 @@ export const PageProvider = ({ children }) => {
     // Check device memory (Chrome only)
     const isLowMemory = navigator.deviceMemory && navigator.deviceMemory < 4;
 
-    const result = prefersReducedMotion || isSlowConnection || isLowMemory;
-    sessionStorage.setItem("isLowEndDevice", result.toString());
+    // Safari and Firefox don't support navigator.connection or deviceMemory, so
+    // those checks give undefined there. Without Boolean() the result could be
+    // undefined, and undefined.toString() crashed the whole site on iPhones.
+    const result = Boolean(
+      prefersReducedMotion || isSlowConnection || isLowMemory
+    );
+    sessionStorage.setItem("isLowEndDevice", String(result));
     return result;
   }, []);
 
