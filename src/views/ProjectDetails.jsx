@@ -10,7 +10,12 @@ import styled from "styled-components";
 import ImageGrid from "../components/ImageGrid";
 import InfoGrid from "../components/InfoGrid";
 import { formatDate } from "../util/formatDate";
-import { hotspotPosition, responsiveImage } from "../sanity/client";
+import Seo from "../components/Seo";
+import {
+  hotspotPosition,
+  responsiveImage,
+  shareImageUrl,
+} from "../sanity/client";
 import { PROJECT_QUERY } from "../sanity/queries";
 import useSanityQuery from "../sanity/useSanityQuery";
 
@@ -33,7 +38,8 @@ const CoverImageContainer = styled.div`
   }
 `;
 
-const CoverTitle = styled.div`
+const CoverTitle = styled.h1`
+  margin: 0;
   position: absolute;
   top: 0;
   left: 0;
@@ -46,7 +52,7 @@ const CoverTitle = styled.div`
   text-align: center;
   font-size: var(--font-size-6xl);
   line-height: 1.1;
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-normal);
   letter-spacing: var(--letter-spacing-tight);
 `;
 
@@ -124,7 +130,12 @@ const ProjectDetails = () => {
   }
 
   if (!project) {
-    return <StatusPage>Project not found</StatusPage>;
+    return (
+      <>
+        <Seo title="Project not found | Nishant Jain Photography" noindex />
+        <StatusPage>Project not found</StatusPage>
+      </>
+    );
   }
 
   const { coverImage, images } = project;
@@ -134,6 +145,15 @@ const ProjectDetails = () => {
 
   return (
     <>
+      <Seo
+        title={`${project.title} – ${project.category} Photography | Nishant Jain`}
+        description={
+          project.description ||
+          `${project.category} photography project "${project.title}" by Mumbai-based photographer Nishant Jain.`
+        }
+        image={shareImageUrl(coverImage)}
+        type="article"
+      />
       <CoverImageContainer className="cover-img">
         <img
           alt={coverImage.alt || project.title}

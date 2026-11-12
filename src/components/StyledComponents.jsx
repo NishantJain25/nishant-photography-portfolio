@@ -42,8 +42,10 @@ export const SectionRowContainer = styled.div`
   }
 `;
 
-export const SectionTitle = styled.p`
+export const SectionTitle = styled.h2`
   font-size: var(--font-size-7xl);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: normal;
   line-height: 1.1;
   color: white;
   margin: 0;

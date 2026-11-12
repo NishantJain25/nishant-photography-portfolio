@@ -16,7 +16,11 @@ const builder = client && createImageUrlBuilder(client);
 const imageUrl = (image, width) =>
   builder.image(image).width(width).fit("max").auto("format").url();
 
-const IMAGE_WIDTHS = [400, 640, 800, 1000, 1400, 2000, 2400];
+// A 1200x630 JPEG for link previews, cropped around the image's hotspot.
+export const shareImageUrl = (image) =>
+  builder.image(image).width(1200).height(630).fit("crop").format("jpg").url();
+
+const IMAGE_WIDTHS =[400, 640, 800, 1000, 1400, 2000, 2400];
 
 // Props for <img> that let the browser download the smallest version that looks
 // sharp. `sizes` says how wide the image displays, e.g. "(max-width: 768px) 100vw, 50vw".

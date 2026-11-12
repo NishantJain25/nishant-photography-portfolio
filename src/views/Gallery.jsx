@@ -5,6 +5,7 @@ import {
   StatusMessage,
 } from "../components/StyledComponents";
 import PageHeader from "../components/PageHeader";
+import Seo from "../components/Seo";
 import ImageGrid from "../components/ImageGrid";
 import useSite from "../context/siteContext";
 import useSanityQuery from "../sanity/useSanityQuery";
@@ -29,6 +30,10 @@ const Gallery = () => {
     <>
       <PageContainer data-scroll-section id="page-container">
         <SectionContainer id="section-container" justify="flex-start">
+          <Seo
+            title="Gallery | Nishant Jain Photography"
+            description="Browse portrait, event, product and interior photography by Nishant Jain, a photographer based in Mumbai."
+          />
           <PageHeader
             title="Gallery"
             itemCount={images.length}

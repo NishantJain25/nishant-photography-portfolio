@@ -10,6 +10,8 @@
 
 # production
 /build
+# generated before each build by scripts/generate-sitemap.js
+/public/sitemap.xml
 
 # misc
 .DS_Store

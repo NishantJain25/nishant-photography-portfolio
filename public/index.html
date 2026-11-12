@@ -2,14 +2,61 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/logo.svg" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="%PUBLIC_URL%/logo.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
+
+    <!--
+      Defaults for crawlers and link previews that don't run JavaScript. Each page
+      replaces these as it loads (see src/components/Seo.jsx). If the site moves
+      to a custom domain, update the URLs here and in src/constants/seo.js.
+    -->
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="Nishant Jain is a Mumbai-based photographer specialising in portrait, event, product and interior photography. Browse selected projects and get in touch for a shoot."
     />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Nishant Jain Photography" />
+    <meta property="og:title" content="Nishant Jain | Photographer in Mumbai" />
+    <meta
+      property="og:description"
+      content="Portrait, event, product and interior photography by Mumbai-based photographer Nishant Jain."
+    />
+    <meta
+      property="og:image"
+      content="https://nishantjainphotography.netlify.app/og-image.jpg"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="google-site-verification" content="kAzGbRHJWkf6eSUkVdK402u4ljUWS32y0BATd_pFs7w" />
+    <!--
+      Placeholder only: after each build, scripts/add-structured-data.js replaces
+      this with your name, location and social links from Site settings in Sanity.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://nishantjainphotography.netlify.app/#person",
+            "name": "Nishant Jain",
+            "url": "https://nishantjainphotography.netlify.app/"
+          },
+          {
+            "@type": "WebSite",
+            "name": "Nishant Jain Photography",
+            "url": "https://nishantjainphotography.netlify.app/",
+            "publisher": {
+              "@id": "https://nishantjainphotography.netlify.app/#person"
+            }
+          }
+        ]
+      }
+    </script>
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -29,7 +76,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&family=Bitcount+Grid+Double:wght@100..900&display=swap" rel="stylesheet">
     
-    <title>Nishant Jain | Photographer</title>
+    <title>Nishant Jain | Photographer in Mumbai</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

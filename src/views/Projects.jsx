@@ -7,6 +7,7 @@ import {
   StatusMessage,
 } from "../components/StyledComponents";
 import PageHeader from "../components/PageHeader";
+import Seo from "../components/Seo";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import useSite from "../context/siteContext";
@@ -88,6 +89,10 @@ const Projects = () => {
   return (
     <PageContainer data-scroll-section id="page-container">
       <SectionContainer id="section-container" justify="flex-start">
+        <Seo
+          title="Projects | Nishant Jain Photography"
+          description="Photography projects by Mumbai-based photographer Nishant Jain, from portrait sessions and events to product shoots and interiors."
+        />
         <PageHeader
           title="Projects"
           itemCount={projects.length}

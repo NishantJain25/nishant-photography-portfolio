@@ -18,7 +18,7 @@ const PageHeader = ({
   return (
     <Header id="header">
       <HeaderTextContainer id="header-text-container">
-        <HeaderText>{title}</HeaderText>
+        <HeaderText as="h1">{title}</HeaderText>
         {itemCount > 0 && <ItemCount>[{itemCount}]</ItemCount>}
       </HeaderTextContainer>
       <Filter

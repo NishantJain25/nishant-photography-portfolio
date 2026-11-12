@@ -7,6 +7,7 @@ import Home from "./views/Home";
 import Gallery from "./views/Gallery";
 import Projects from "./views/Projects";
 import ProjectDetails from "./views/ProjectDetails";
+import NotFound from "./views/NotFound";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -18,6 +19,7 @@ root.render(
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:slug" element={<ProjectDetails />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </BrowserRouter>

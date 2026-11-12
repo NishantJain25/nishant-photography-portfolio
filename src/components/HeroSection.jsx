@@ -17,14 +17,16 @@ const Heading = styled.div`
   font-size: 12vw;
   font-size: 15.5cqw;
   letter-spacing: var(--letter-spacing-tighter);
-  font-weight: var(--font-weight-regular);
+  font-weight: var(--font-weight-normal);
   color: white;
   margin: 0;
   line-height: 100%;
 `;
 
 // Sized to this box instead of the screen, so the name always spans it exactly.
-const TitleContainer = styled.div`
+// It's the home page's main heading, so it's an h1 for search engines.
+const TitleContainer = styled.h1`
+  margin: 0;
   container-type: inline-size;
   display: flex;
   flex-direction: row;
